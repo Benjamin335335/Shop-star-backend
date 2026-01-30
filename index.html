@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Pro - Buy & Sell Online</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Authentication Container -->
+    <div id="auth-container" class="auth-container">
+        <div class="auth-card">
+            <div class="auth-logo">🛍️ Shop Pro</div>
+            <p class="auth-subtitle">Marketplace for Buyers & Sellers</p>
+            
+            <!-- Login Panel -->
+            <div id="login-panel" class="auth-panel">
+                <h2>Login</h2>
+                <form id="login-form" onsubmit="login(event)">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="login-username" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Login</button>
+                </form>
+                <p class="auth-toggle">Don't have an account? <a onclick="showSignupPanel()">Sign Up</a></p>
+                <div class="demo-credentials">
+                    <p><strong>Demo Admin:</strong> admin / admin123</p>
+                </div>
+            </div>
+            
+            <!-- Signup Panel -->
+            <div id="signup-panel" class="auth-panel" style="display:none;">
+                <h2>Create Account</h2>
+                <form id="signup-form" onsubmit="signup(event)">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="signup-username" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="signup-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="signup-fullname">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="signup-password" required>
+                    </div>
+                    <button type="submit" class="btn btn-success btn-full">Sign Up</button>
+                </form>
+                <p class="auth-toggle">Already have an account? <a onclick="showLoginPanel()">Login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="app-container" class="app-container" style="display:none;">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">🛍️ Shop Pro</div>
+                <ul class="nav-menu">
+                    <li><a href="#" class="nav-link" onclick="showSection('home')">Home</a></li>
+                    <li><a href="#" class="nav-link" onclick="showSection('products')">Shop</a></li>
+                    <li><a href="#" class="nav-link" onclick="viewCart()">❤️ Stored Order <span id="cart-count">0</span></a></li>
+                    <li id="seller-nav" style="display:none;"><a href="#" class="nav-link" onclick="viewSellerDashboard()">📤 Sell</a></li>
+                    <li id="admin-nav" style="display:none;"><a href="#" class="nav-link" onclick="viewAdminPanel()">⚙️ Admin</a></li>
+                    <li><a href="#" class="nav-link" onclick="viewProfile()">👤 Profile</a></li>
+                    <li><a href="#" class="nav-link" onclick="viewFavorites()">❤️ Favorites</a></li>
+                    <li><a href="#" class="nav-link" onclick="toggleTheme()">🌙</a></li>
+                    <li id="user-info" class="nav-link user-info"></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Home Section -->
+        <section id="home" class="section active">
+            <div class="hero">
+                <h1>Welcome to Shop Pro</h1>
+                <p>Buy amazing products and start your business today!</p>
+                <div id="stats" class="stats-grid"></div>
+                <div style="margin-top: 2rem;">
+                    <button class="btn btn-primary" onclick="showSection('products')">Start Shopping</button>
+                    <button class="btn btn-success" id="sell-btn" style="display:none;" onclick="viewSellerDashboard()">Start Selling</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Products Section -->
+        <section id="products" class="section">
+            <div class="container">
+                <div class="products-header">
+                    <h2>Our Products</h2>
+                    <div class="search-bar">
+                        <input type="text" id="search-input" placeholder="Search products..." onkeyup="filterProducts()">
+                        <select id="category-filter" onchange="filterProducts()">
+                            <option value="">All Categories</option>
+                            <option value="electronics">Electronics</option>
+                            <option value="clothing">Clothing</option>
+                            <option value="books">Books</option>
+                            <option value="home">Home & Garden</option>
+                            <option value="sports">Sports</option>
+                            <option value="toys">Toys</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <select id="sort-filter" onchange="sortProducts()">
+                            <option value="newest">Newest</option>
+                            <option value="price-low">Price: Low to High</option>
+                            <option value="price-high">Price: High to Low</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="products-grid" id="products-grid"></div>
+            </div>
+        </section>
+
+        <!-- Favorites Section (Replaces Cart) -->
+        <section id="cart" class="section">
+            <div class="container">
+                <h2>My Favorites</h2>
+                <p style="color: #666; margin-bottom: 1.5rem;">Click the heart icon on products to add them to favorites.</p>
+                <div id="cart-items" class="cart-items"></div>
+            </div>
+        </section>
+
+        <!-- Favorites Section -->
+        <section id="favorites" class="section">
+            <div class="container">
+                <h2>My Favorites</h2>
+                <div class="products-grid" id="favorites-grid"></div>
+            </div>
+        </section>
+
+        <!-- Profile Section -->
+        <section id="profile" class="section">
+            <div class="container">
+                <h2>My Profile</h2>
+                <form id="profile-form" onsubmit="updateProfile(event)" class="profile-form">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="profile-name">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="profile-email">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="tel" id="profile-phone">
+                    </div>
+                    <div class="form-group">
+                        <label>Address</label>
+                        <textarea id="profile-address"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Profile</button>
+                </form>
+                <div class="profile-section" style="margin-top: 2rem;">
+                    <h3>Data Management</h3>
+                    <button class="btn btn-secondary" onclick="exportData()">📥 Export Data</button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()">📤 Import Data</button>
+                    <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(event)">
+                </div>
+            </div>
+        </section>
+
+        <!-- Seller Dashboard -->
+        <section id="seller-dashboard" class="section">
+            <div class="container">
+                <h2>Seller Dashboard</h2>
+                <div class="seller-section">
+                    <h3>Upload New Product</h3>
+                    <form id="product-form" onsubmit="uploadProduct(event)">
+                        <div class="form-group">
+                            <label>Product Name *</label>
+                            <input type="text" id="product-name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Category *</label>
+                            <select id="product-category" required>
+                                <option value="">Select Category</option>
+                                <option value="electronics">Electronics</option>
+                                <option value="clothing">Clothing</option>
+                                <option value="books">Books</option>
+                                <option value="home">Home & Garden</option>
+                                <option value="sports">Sports</option>
+                                <option value="toys">Toys</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea id="product-description"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Price Type</label>
+                            <input type="radio" name="price-type" value="fixed" checked> Fixed Price
+                            <input type="radio" name="price-type" value="range"> Price Range
+                        </div>
+
+                        <div class="form-group">
+                            <label>Price</label>
+                            <input type="number" id="product-price" step="0.01">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Price Range (Min - Max)</label>
+                            <input type="number" id="product-price-min" step="0.01">
+                            <input type="number" id="product-price-max" step="0.01">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Contact Methods</label>
+                            <input type="checkbox" name="contact-method" value="email"> Email
+                            <input type="checkbox" name="contact-method" value="phone"> Phone
+                            <input type="checkbox" name="contact-method" value="whatsapp"> WhatsApp
+                            <input type="checkbox" name="contact-method" value="instagram"> Instagram
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="product-email">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="tel" id="product-phone">
+                        </div>
+
+                        <div class="form-group">
+                            <label>WhatsApp</label>
+                            <input type="tel" id="product-whatsapp">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Instagram Handle (e.g., @myshop)</label>
+                            <input type="text" id="product-instagram" placeholder="@yourusername">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Upload Product</button>
+                    </form>
+                </div>
+
+                <div id="seller-analytics" class="seller-analytics-card">
+                    <!-- Seller analytics will be loaded here -->
+                </div>
+                <div class="seller-section">
+                    <h3>My Products</h3>
+                    <div id="seller-products" class="seller-products-list"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Admin Panel -->
+        <section id="admin-panel" class="section">
+            <div class="container">
+                <h2>Admin Panel</h2>
+                
+                <div class="admin-section">
+                    <h3>Add Seller</h3>
+                    <form id="create-seller-form" onsubmit="createNewSeller(event)">
+                        <div class="form-group">
+                            <label>Username *</label>
+                            <input type="text" id="new-seller-username" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email *</label>
+                            <input type="email" id="new-seller-email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" id="new-seller-fullname">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="tel" id="new-seller-phone">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Shop Name</label>
+                            <input type="text" id="new-seller-shopname">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Shop Description</label>
+                            <textarea id="new-seller-description"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" id="new-seller-password" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Create Seller</button>
+                    </form>
+                </div>
+
+                <div class="admin-section">
+                    <h3>All Sellers</h3>
+                    <div id="sellers-list" class="sellers-list"></div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>Seller Analytics</h3>
+                    <p style="color:#666; margin-bottom: 1rem;">Overview of sales and products for each seller.</p>
+                    <div id="seller-analytics" class="seller-analytics"></div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>All Users</h3>
+                    <p style="color:#666; margin-bottom: 1rem;">View all registered users and convert buyers into sellers.</p>
+                    <div id="users-list" class="sellers-list"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+
+    <!-- Product Modal -->
+    <div id="product-modal" class="modal"></div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
